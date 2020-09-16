@@ -1,5 +1,6 @@
 ---
-title: "LLCU255 Assignment2"
+title: "LLCU255 Data and Literary study"
+subtitle: "Individual Assignment 2"
 author: "Shenshun Yao 260709204"
 date: "15/09/2020"
 abstract: "In this assignment, our goal is to get comfortable working with tables in R based on Novel150 data set."
@@ -55,7 +56,7 @@ A random selected answer was printed.
 ## Problem 4
 What is the ratio of first-person to third person novels in our sample?
 
-### Solution
+### Solution:
 ```{r}
 # Count the number of first-person and third-person novels respectively.
 numberofFirstperson<-length(a$person[a$person == "first"])
@@ -69,13 +70,59 @@ The ratio is 0.4018692.
 ## Problem 5
 What is the avg length of first and third person novels? Does the difference seem large to you?
 
+### Solution:
 ```{r}
-firstperson<-subset(a, a$person == "first")
-firstperson_avg<-mean(firstperson$length)
-firstperson_avg
-thirdperson<-subset(a, a$person == "third")
-thirdperson_avg<-mean(thirdperson$length)
-thirdperson_avg
+# firstperson<-subset(a, a$person == "first")
+# firstperson_avg<-mean(firstperson$length)
+# firstperson_avg
+# thirdperson<-subset(a, a$person == "third")
+# thirdperson_avg<-mean(thirdperson$length)
+# thirdperson_avg
+# A faster way to do these calculations
+tapply(a$length, a$person, mean)
 ```
 I think the difference does not seam large to me.
 
+## Problem 6
+What is the average length of 1P novels by women? How does this compare to 3P novels by women?
+
+### Solution:
+```{r}
+female<-a[a$gender == "female",]
+tapply(female$length, female$person, mean)
+```
+The average length of 1P novels by women is 102254.5 which is less than 3P novels by women(133519.6).
+
+## Problem 7
+List the avg. length of novels by decade. What do you observe? Figure out how to plot for extra credit (insert screen shot here).
+
+### Solution:
+```{r}
+# Convert the date column to a column of strings to utilize the substring function
+a$decade<-as.character(a$date)
+# Transform the 4th digit to a 0
+substring(a$decade, 4, 4) <- "0"
+# Convert back to integers
+a$decade<-as.numeric(a$decade)
+# Treat decades as factors in order to see what the avg. length is by decade.
+dec.length<-tapply(a$length, as.factor(a$decade), mean)
+dec.length
+```
+
+Already listed the avg. length of novels by decade. I observed that the avg.length of novels by decade was fluctuate and reached the peak in 1860. I used ggplot the visualized the result.
+
+```{r out.width = "60%", fig.align= 'center'}
+#scatterplot
+dec.length.df<-as.data.frame(dec.length)
+ggplot(aes(x = row.names(dec.length.df), y = dec.length), data = dec.length.df)+
+  geom_point()+
+  labs(x="Decade", y="Average Length")
+```
+
+Another way to visualize this is through the use of boxplots. These allow you to see the range of values for each decade which will give you a better sense of those periods that are particularly different.
+
+```{r out.width = "60%", fig.align='center'}
+ggplot(a, aes(x=factor(decade), y=length)) + 
+  geom_boxplot()+
+  labs(x="Decade", y="Length")
+```
